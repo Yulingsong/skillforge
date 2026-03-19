@@ -1,0 +1,35 @@
+{
+  "name": "skillforge",
+  "version": "1.0.0",
+  "description": "AI-powered Skill generation from PRD, TRD, Source Code",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "skillforge": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "generate": "tsx src/cli.ts generate"
+  },
+  "keywords": [
+    "skill",
+    "automation",
+    "ai",
+    "generator",
+    "openclaw"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  }
+}
