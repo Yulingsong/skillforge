@@ -1,6 +1,10 @@
 # SkillForge ⚡
 
 <p align="center">
+  <img src="./logo.svg" alt="SkillForge Logo" width="128" height="128">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/node/v/skillforge-orange" alt="Node">
