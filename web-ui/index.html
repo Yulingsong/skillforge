@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillForge - AI Skill Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 900px;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    .upload-area {
+      border: 3px dashed #ddd;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 20px;
+    }
+    
+    .upload-area:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .upload-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+    }
+    
+    .upload-text {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    .upload-hint {
+      color: #999;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+    
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .option {
+      padding: 15px;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    
+    .option:hover {
+      border-color: #667eea;
+    }
+    
+    .option.selected {
+      border-color: #667eea;
+      background: #f0f3ff;
+    }
+    
+    .option-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .result {
+      margin-top: 30px;
+      display: none;
+    }
+    
+    .result.show {
+      display: block;
+    }
+    
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .result-title {
+      font-size: 1.3rem;
+      color: #333;
+    }
+    
+    .result-content {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔧 SkillForge</h1>
+      <p>AI-powered Skill Generator</p>
+    </div>
+    
+    <div class="content">
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">Drop PRD/TRD/Source file here or click to upload</div>
+        <div class="upload-hint">Supported: .md, .tsx, .vue, .json</div>
+        <input type="file" id="fileInput" accept=".md,.tsx,.vue,.json,.ts,.js" style="display: none;">
+      </div>
+      
+      <div class="options">
+        <div class="option selected" data-type="prd">
+          <div class="option-icon">📋</div>
+          <div>PRD</div>
+        </div>
+        <div class="option" data-type="trd">
+          <div class="option-icon">⚙️</div>
+          <div>TRD</div>
+        </div>
+        <div class="option" data-type="source">
+          <div class="option-icon">💻</div>
+          <div>Source</div>
+        </div>
+        <div class="option" data-type="api">
+          <div class="option-icon">🔌</div>
+          <div>API</div>
+        </div>
+      </div>
+      
+      <button class="btn" id="generateBtn" disabled>Generate Skill</button>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>AI is generating your skill...</div>
+      </div>
+      
+      <div class="result" id="result">
+        <div class="result-header">
+          <div class="result-title">Generated Skill</div>
+          <button class="btn" style="width: auto; padding: 10px 20px; font-size: 0.9rem;" onclick="downloadSkill()">Download</button>
+        </div>
+        <div class="result-content">
+          <pre id="skillContent"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let selectedFile = null;
+    let selectedType = 'prd';
+    
+    // Upload area click handler
+    document.getElementById('uploadArea').addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+    
+    // File input change handler
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        document.querySelector('.upload-text').textContent = `Selected: ${file.name}`;
+        document.getElementById('generateBtn').disabled = false;
+      }
+    });
+    
+    // Option click handlers
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedType = option.dataset.type;
+      });
+    });
+    
+    // Generate button handler
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      if (!selectedFile) return;
+      
+      document.getElementById('loading').classList.add('show');
+      document.getElementById('result').classList.remove('show');
+      
+      try {
+        const content = await selectedFile.text();
+        
+        // For demo, show parsed content as generated skill
+        // In production, this would call the API
+        const skillPreview = `# ${selectedFile.name.replace(/\.[^/.]+$/, '')} 助手
+        
+> Generated from ${selectedType.toUpperCase()}
+
+## Triggers
+- "${selectedFile.name}"
+- "使用${selectedFile.name}"
+
+## Steps
+
+### step_1: 开始操作
+引导用户开始操作
+
+**Tools:** message, prompt
+
+### step_2: 执行操作
+指导用户完成具体操作
+
+**Tools:** message
+
+## Examples
+
+**User:** 如何使用?
+**Assistant:** 让我帮你完成这个操作...
+
+---
+*Generated by SkillForge*`;
+        
+        document.getElementById('skillContent').textContent = skillPreview;
+        document.getElementById('result').classList.add('show');
+      } catch (error) {
+        alert('Error: ' + error.message);
+      } finally {
+        document.getElementById('loading').classList.remove('show');
+      }
+    });
+    
+    function downloadSkill() {
+      const content = document.getElementById('skillContent').textContent;
+      const blob = new Blob([content], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SKILL.md';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

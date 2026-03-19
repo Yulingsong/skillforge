@@ -4,6 +4,7 @@
   "description": "AI-powered Skill generation from PRD, TRD, Source Code",
   "type": "module",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "bin": {
     "skillforge": "dist/cli.js"
   },
@@ -11,19 +12,23 @@
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "test": "vitest run",
-    "generate": "tsx src/cli.ts generate"
+    "generate": "tsx src/cli.ts generate",
+    "serve": "npx serve web-ui"
   },
   "keywords": [
     "skill",
     "automation",
     "ai",
     "generator",
-    "openclaw"
+    "openclaw",
+    "prd",
+    "trd"
   ],
-  "author": "",
+  "author": "Yulingsong",
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
+    "openai": "^4.77.0",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
@@ -31,5 +36,8 @@
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

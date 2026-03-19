@@ -6,3 +6,4 @@ output/
 .idea/
 .vscode/
 *.tgz
+package-lock.json

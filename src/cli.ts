@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// SkillForge CLI
+// SkillForge CLI - Enhanced version
 
 import { Command } from 'commander';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -8,6 +8,7 @@ import { resolve, join } from 'path';
 import picocolors from 'picocolors';
 
 import { parser } from './parser.js';
+import { EnhancedParser } from './enhanced-parser.js';
 import { generator } from './generator.js';
 import { formatter } from './formatter.js';
 import { validator } from './validator.js';
@@ -30,6 +31,10 @@ program
   .option('--no-examples', 'Exclude examples')
   .option('--no-validation', 'Skip validation')
   .option('--validate-only', 'Only validate input without generating')
+  .option('--ai', 'Enable AI enhancement')
+  .option('--ai-provider <provider>', 'AI provider (openai, anthropic, gemini)', 'openai')
+  .option('--ai-model <model>', 'AI model', 'gpt-4o-mini')
+  .option('--ai-key <key>', 'AI API key')
   .action(async (inputFile: string, options) => {
     try {
       console.log(picocolors.blue('🔧 SkillForge - AI Skill Generator\n'));
@@ -51,9 +56,24 @@ program
       
       console.log(picocolors.gray(`🔍 Detected type: ${inputType}`));
       
-      // Parse
+      // Parse (with AI enhancement if enabled)
       console.log(picocolors.gray('🧠 Parsing content...\n'));
-      const parsed = await parser.parse(content, inputType);
+      
+      let parsed;
+      if (options.ai && options.aiKey) {
+        console.log(picocolors.gray(`🤖 AI Enhancement: Enabled`));
+        console.log(picocolors.gray(`   Provider: ${options.aiProvider}`));
+        console.log(picocolors.gray(`   Model: ${options.aiModel}\n`));
+        
+        const enhancedParser = new EnhancedParser({
+          provider: options.aiProvider,
+          apiKey: options.aiKey,
+          model: options.aiModel
+        });
+        parsed = await enhancedParser.parseWithAI(content, inputType);
+      } else {
+        parsed = await parser.parse(content, inputType);
+      }
       
       console.log(picocolors.green(`✅ Parsed successfully`));
       console.log(picocolors.gray(`   Title: ${parsed.metadata.title || 'N/A'}`));
@@ -85,10 +105,6 @@ program
       if (options.validation) {
         const validation = validator.validate(skill);
         validator.printResults(validation);
-        
-        if (!validation.valid) {
-          console.log(picocolors.yellow('⚠️  Generated with errors - proceed with caution\n'));
-        }
       }
       
       // Output
@@ -117,12 +133,12 @@ program
       
       // Write references
       const references = formatter.formatReferences(skill);
-      Object.entries(references).forEach(([filename, content]) => {
+      Object.entries(references).forEach(([filename, fileContent]) => {
         const refDir = join(outputDir, 'references');
         if (!existsSync(refDir)) {
           mkdirSync(refDir, { recursive: true });
         }
-        writeFileSync(join(refDir, filename), content);
+        writeFileSync(join(refDir, filename), fileContent);
         console.log(picocolors.green(`✅ Written: ${join(refDir, filename)}`));
       });
       
@@ -132,6 +148,55 @@ program
       console.log(picocolors.gray(`   1. Review SKILL.md`));
       console.log(picocolors.gray(`   2. Customize as needed`));
       console.log(picocolors.gray(`   3. Copy to your AI agent's skills folder\n`));
+      
+    } catch (error) {
+      console.error(picocolors.red(`\n❌ Error: ${error}`));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('validate')
+  .description('Validate a generated Skill')
+  .argument('<file>', 'SKILL.md file to validate')
+  .option('--test <query>', 'Test with sample input')
+  .action(async (skillFile: string, options) => {
+    try {
+      console.log(picocolors.blue('🔧 SkillForge - Skill Validator\n'));
+      
+      const filePath = resolve(skillFile);
+      if (!existsSync(filePath)) {
+        console.error(picocolors.red(`❌ File not found: ${filePath}`));
+        process.exit(1);
+      }
+      
+      const content = readFileSync(filePath, 'utf-8');
+      
+      // Parse SKILL.md to extract skill info
+      // For now, we'll do basic validation
+      console.log(picocolors.gray(`📄 Validating: ${skillFile}\n`));
+      
+      // Basic checks
+      const hasTitle = content.includes('# ');
+      const hasTriggers = content.includes('## Triggers') || content.includes('## Triggers');
+      const hasSteps = content.includes('## Steps') || content.includes('## Steps');
+      
+      console.log(picocolors.gray('📋 Basic Checks:'));
+      console.log(`   Title: ${hasTitle ? '✅' : '❌'}`);
+      console.log(`   Triggers: ${hasTriggers ? '✅' : '❌'}`);
+      console.log(`   Steps: ${hasSteps ? '✅' : '❌'}\n`);
+      
+      if (!hasTitle || !hasTriggers || !hasSteps) {
+        console.log(picocolors.yellow('⚠️  SKILL.md may not be valid\n'));
+      } else {
+        console.log(picocolors.green('✅ SKILL.md appears valid\n'));
+      }
+      
+      // Test with query if provided
+      if (options.test) {
+        console.log(picocolors.gray(`🧪 Testing with: "${options.test}"`));
+        console.log(picocolors.yellow('   (Test functionality coming soon)\n'));
+      }
       
     } catch (error) {
       console.error(picocolors.red(`\n❌ Error: ${error}`));
@@ -151,38 +216,39 @@ program
 
 ## 功能需求
 
-### 用户登录
+### 1. 用户登录
 - 支持手机号登录
 - 支持邮箱登录
 - 支持第三方登录（微信、Google）
 
-### 用户注册
+### 2. 用户注册
 - 手机号注册
 - 邮箱注册
 - 验证码验证
 
-### 个人信息
+### 3. 个人信息
 - 查看个人信息
 - 修改昵称
 - 修改头像
 - 修改密码
 
-## 业务流程
+## 用户流程
 
 ### 登录流程
-1. 选择登录方式
-2. 输入账号信息
-3. 输入密码或验证码
-4. 点击登录
-5. 登录成功，跳转首页
+1. 用户进入登录页面
+2. 选择登录方式
+3. 输入账号信息
+4. 点击登录按钮
+5. 系统验证
+6. 登录成功跳转首页
 
 ### 注册流程
-1. 选择注册方式
-2. 输入手机号/邮箱
-3. 获取验证码
-4. 输入验证码
+1. 用户进入注册页面
+2. 选择注册方式
+3. 填写基本信息
+4. 获取并输入验证码
 5. 设置密码
-6. 完成注册
+6. 完成注册，自动登录
 
 ## 数据实体
 
@@ -198,6 +264,16 @@ program
     console.log(picocolors.green(`📄 Generated sample PRD: ${name}.md\n`));
     writeFileSync(`${name}.md`, samplePRD);
     console.log(picocolors.blue(`   Run: skillforge generate ${name}.md\n`));
+  });
+
+program
+  .command('serve')
+  .description('Start web UI server (coming soon)')
+  .option('-p, --port <port>', 'Port number', '3000')
+  .action((options) => {
+    console.log(picocolors.yellow('\n🛠️  Web UI coming soon!\n'));
+    console.log(picocolors.gray('   For now, use CLI:'));
+    console.log(picocolors.gray('   $ skillforge generate <input> -o <output>\n'));
   });
 
 program.parse();
