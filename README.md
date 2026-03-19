@@ -5,15 +5,24 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Yulingsong/skillforge/stargazers">
+    <img src="https://img.shields.io/github/stars/Yulingsong/skillforge" alt="Stars">
+  </a>
+  <a href="https://github.com/Yulingsong/skillforge/network">
+    <img src="https://img.shields.io/github/forks/Yulingsong/skillforge" alt="Forks">
+  </a>
   <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/node/v/skillforge-orange" alt="Node">
-  <img src="https://img.shields.io/github/stars/Yulingsong/skillforge" alt="Stars">
-  <img src="https://img.shields.io/npm/dm/skillforge" alt="Downloads">
 </p>
 
 <p align="center">
   <strong>AI 驱动的自动化技能生成工具 | 一键生成 AI Skill</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Yulingsong/skillforge/blob/master/README.md">中文</a> •
+  <a href="https://github.com/Yulingsong/skillforge/blob/master/README.en.md">English</a>
 </p>
 
 ---
@@ -146,6 +155,9 @@ skillforge generate input.md --ai --ai-provider gemini --ai-key $GEMINI_KEY
 - [API 参考](./docs/api.zh-CN.md) - 编程接口
 - [使用教程](./docs/tutorial.md) - 详细教程
 - [常见问题](./docs/faq.md) - FAQ
+- [故障排除](./TROUBLESHOOTING.md) - 问题排查
+- [贡献指南](./CONTRIBUTING.md) - 如何贡献
+- [行为准则](./CODE_OF_CONDUCT.md) - 社区准则
 
 ---
 
