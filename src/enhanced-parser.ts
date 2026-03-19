@@ -6,14 +6,9 @@ import type {
   ExtractedEntity, 
   UserFlow,
   FlowStep,
-  FlowInput
+  FlowInput,
+  LLMConfig
 } from './types.js';
-
-export interface LLMConfig {
-  provider: 'openai' | 'anthropic' | 'gemini';
-  apiKey?: string;
-  model?: string;
-}
 
 export class EnhancedParser {
   private llmConfig?: LLMConfig;

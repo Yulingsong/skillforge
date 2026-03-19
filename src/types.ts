@@ -115,3 +115,22 @@ export interface ValidationWarning {
   field: string;
   message: string;
 }
+
+// LLM Types
+export interface LLMConfig {
+  provider: 'openai' | 'anthropic' | 'gemini';
+  apiKey?: string;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  enabled?: boolean; // For backward compatibility
+}
+
+export interface LLMResponse {
+  content: string;
+  usage: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+}
